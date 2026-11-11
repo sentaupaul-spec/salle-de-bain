@@ -165,8 +165,8 @@ dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-n
         <dt>Douche (projet)</dt><dd>140 × 90</dd>
         <dt>Passage douche</dt><dd>70</dd>
         <dt>Passage cloison ↔ banc</dt><dd>51</dd>
-        <dt>Bord des vasques</dt><dd>h. 90</dd>
-        <dt>Plan du meuble</dt><dd>h. 76</dd>
+        <dt>Bord des vasques</dt><dd>h. 89</dd>
+        <dt>Plan du meuble</dt><dd>h. 84</dd>
       </dl>
     </section>
 
@@ -591,8 +591,9 @@ const IP = {
   bench: { t: 'Banc de douche', d: '50 × 40 · assise à 45', s: 'p', n: "Au fond, collé au mur des étagères sans vide. Un seul angle arrondi, l'angle libre côté douche : 51 cm de passage en diagonale depuis le bout de la cloison. Au-dessus, 2,10 m sous rampant au minimum." },
   sep: { t: 'Mur douche / rangements', d: '98 × 8 · jusqu’au rampant', s: 'p' },
   shelves: { t: 'Étagères ouvertes', d: '45 de profondeur · 70 de large', s: 'p', n: 'Pour les serviettes, ouvertes vers la pièce. Fond fermé ; en bas, deux bacs à roulettes de 90 cm exploitent toute la profondeur.' },
-  vanity: { t: 'Meuble double vasque', d: '264 × 55 · plan à 76', s: 'p', n: "Meuble suspendu en chêne clair à tiroirs, plan en pierre claire, sur tout le mur B. Le plan est à 76 pour que le bord des vasques posées arrive à 90. Le plan libre côté porte sert pour le maquillage." },
-  basin: { t: 'Vasques posées + robinets muraux', d: 'vasques ≈ 40 × 48 · bord à 90', s: 'p', n: "Vasques à 1,10 m et 2,00 m de la porte (90 cm d'écart) : au-dessus de chacune, au moins 2 m sous le rampant. Robinets laiton sortant du mur, au-dessus des vasques." },
+  vanity: { t: 'Meuble double vasque', d: '264 × 55 · plan à 84', s: 'p', n: "Meuble suspendu en chêne clair à tiroirs, plan en pierre claire, sur tout le mur B. Le plan est à 84 pour que le bord des vasques arrive à 89." },
+  basin: { t: 'Vasques ovales semi-encastrées', d: '≈ 54 × 40 · dépassent de 5 · bord à 89', s: 'p', n: "Posées dans une découpe du plan, elles dépassent un peu. À 1,10 m et 2,00 m de la porte (90 cm d'écart), avec au moins 2 m sous le rampant au-dessus. Mitigeur laiton sur le plan, juste derrière chaque vasque." },
+  niche: { t: 'Meuble à niches (maquillage)', d: '35 × 35 · h. 56 · 3 niches', s: 'p', n: 'Posé sur le plan côté porte, ouvert vers la pièce. Niches de 17 cm de haut pour les produits de maquillage.' },
   mirror: { t: 'Grand miroir éclairé', d: '120 × 70', s: 'p', n: 'Centré sur les vasques, bandeau LED en haut (IRC ≥ 90, ≈ 4000 K). Son bord droit reste sous la pente.' },
   towel: { t: 'Sèche-serviettes', d: '50 × 110', s: 'p', n: "Au pied du mur bas, à l'emplacement du chauffage actuel. Modèle à choisir." },
   spots: { t: 'Spots encastrés', d: '3 au plafond', s: 'p' },
@@ -681,26 +682,32 @@ for (const [z0, z1] of [[201, 231], [234, 264]]) {
 // Meuble double vasque (2/3 du mur B, côté mur bas)
 // Meuble suspendu en chêne clair, plan en pierre claire à 76, vasques posées (bord à 90), robinets muraux laiton
 const OAK = 0xc8a073, BRASS = 0xb8925a, brass = { metal: .7, rough: .35 };
-box(199, 254, 25, 72, 2, 266, OAK, { ...PJ, rough: .7, info: IP.vanity });
-for (const z of [68, 134, 200]) box(198.4, 199, 26, 71, z - .3, z + .3, 0x9c7a55, { ...PJ, info: IP.vanity });
-box(198.4, 199, 48.3, 48.9, 4, 264, 0x9c7a55, { ...PJ, info: IP.vanity });
-box(197, 254, 72, 76, 0, P, 0xe6dfd3, { ...PJ, rough: .5, info: IP.vanity });
-for (const z of [110, 200]) {
-  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(20, 13, 14, 48), new THREE.MeshStandardMaterial({ color: 0xf6f5f1, roughness: .3 }));
-  bowl.scale.z = 1.2; bowl.position.set(226, 83, z); bowl.userData.info = IP.basin; proj.add(bowl); pickables.push(bowl);
-  const inner = new THREE.Mesh(new THREE.CircleGeometry(18, 40), new THREE.MeshStandardMaterial({ color: 0xdcdedb, roughness: .3 }));
-  inner.scale.set(1, 1.2, 1); inner.rotation.x = -Math.PI / 2; inner.position.set(226, 90.05, z); inner.userData.info = IP.basin; proj.add(inner); pickables.push(inner);
-  box(234, 254, 101, 104, z - 1.5, z + 1.5, BRASS, { ...PJ, ...brass, info: IP.basin });
-  box(251, 254, 110, 116, z - 3, z + 3, BRASS, { ...PJ, ...brass, info: IP.basin });
-}
-// Plante et tapis, pour l'ambiance
+box(199, 254, 25, 80, 2, 266, OAK, { ...PJ, rough: .7, info: IP.vanity });
+for (const z of [68, 134, 200]) box(198.4, 199, 26, 79, z - .3, z + .3, 0x9c7a55, { ...PJ, info: IP.vanity });
+box(198.4, 199, 52.3, 52.9, 4, 264, 0x9c7a55, { ...PJ, info: IP.vanity });
+box(197, 254, 80, 84, 0, P, 0xe6dfd3, { ...PJ, rough: .5, info: IP.vanity });
+// Petit meuble à niches sur le plan, côté porte : 35 × 35, 3 niches ouvertes vers la pièce
 {
-  const pot = new THREE.Mesh(new THREE.CylinderGeometry(7, 6, 16, 24), new THREE.MeshStandardMaterial({ color: 0xf1ede6, roughness: .8 }));
-  pot.position.set(232, 84, 36); proj.add(pot);
-  const leaves = new THREE.Mesh(new THREE.IcosahedronGeometry(16, 1), new THREE.MeshStandardMaterial({ color: 0x6f8f5e, roughness: .9, flatShading: true }));
-  leaves.position.set(232, 104, 36); leaves.scale.set(.9, 1.2, .9); proj.add(leaves);
-  box(140, 195, 0, .8, 110, 200, 0xd9cfbf, { ...PJ, rough: 1 });
+  const N = { ...PJ, rough: .7, info: IP.niche };
+  box(219, 254, 84, 140, 4, 5.8, OAK, N);
+  box(219, 254, 84, 140, 37.2, 39, OAK, N);
+  box(252.2, 254, 84, 140, 5.8, 37.2, OAK, N);
+  for (const y of [84, 102.5, 121, 138.2]) box(219, 252.2, y, y + 1.8, 5.8, 37.2, OAK, N);
 }
+for (const z of [110, 200]) {
+  // Vasque ovale semi-encastrée : posée dans une découpe du plan, elle dépasse de 5 cm (bord à 89)
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 10, 56), new THREE.MeshStandardMaterial({ color: 0xf6f5f1, roughness: .3 }));
+  bowl.scale.set(20, 1, 27); bowl.position.set(222, 84, z); bowl.userData.info = IP.basin; proj.add(bowl); pickables.push(bowl);
+  const inner = new THREE.Mesh(new THREE.CircleGeometry(1, 56), new THREE.MeshStandardMaterial({ color: 0xdcdedb, roughness: .3 }));
+  inner.scale.set(17, 24, 1); inner.rotation.x = -Math.PI / 2; inner.position.set(222, 89.05, z); inner.userData.info = IP.basin; proj.add(inner); pickables.push(inner);
+  // Mitigeur posé sur le plan, juste derrière la vasque
+  const tube = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.2, 22, 20), new THREE.MeshStandardMaterial({ color: BRASS, metalness: .7, roughness: .35 }));
+  tube.position.set(247, 95, z); tube.userData.info = IP.basin; proj.add(tube); pickables.push(tube);
+  box(232, 248.5, 104, 106.5, z - 1.4, z + 1.4, BRASS, { ...PJ, ...brass, info: IP.basin });
+  box(247, 249, 98, 100, z + 1.5, z + 7, BRASS, { ...PJ, ...brass, info: IP.basin });
+}
+// Tapis devant les vasques
+box(140, 195, 0, .8, 110, 200, 0xd9cfbf, { ...PJ, rough: 1 });
 {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(120, 70), new THREE.MeshStandardMaterial({ color: 0xc6d3d6, metalness: .35, roughness: .12 }));
   m.rotation.y = -Math.PI / 2; m.position.set(253.4, 147, 155); m.userData.info = IP.mirror; proj.add(m); pickables.push(m);
