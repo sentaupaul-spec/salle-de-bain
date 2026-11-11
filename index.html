@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Modèle 3D de la salle de bain sous combles, pour préparer les travaux.">
+<meta property="og:title" content="Salle de bain sous combles">
+<meta property="og:description" content="Modèle 3D de la salle de bain, à faire tourner du doigt.">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{box-sizing:border-box}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Salle de bain sous combles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout : une scène 3D plein cadre à gauche, un panneau de commande étroit à droite ; sur téléphone, la scène en haut et le panneau dessous. */
+:root{
+  --bg:#eef0ec; --panel:#fbfbf8; --fg:#1d2926; --muted:#5b6965; --line:#d4dbd6;
+  --accent:#2c6c5f; --accent-soft:#dcebe5; --mark:#cf3328; --scene:#e3e7e2;
+  --water:#2a7fd4; --est:#a86a12; --est-soft:#f6e9d3; --dim:#22403a;
+  --font-ui:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a19; --panel:#1c2422; --fg:#e3ebe8; --muted:#9aaaa5; --line:#33413d;
+  --accent:#74bba9; --accent-soft:#20403a; --mark:#ff6b5f; --scene:#192120;
+  --water:#5aaaf2; --est:#e3aa4f; --est-soft:#3a2e1a; --dim:#cfe0da; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a19; --panel:#1c2422; --fg:#e3ebe8; --muted:#9aaaa5; --line:#33413d;
+  --accent:#74bba9; --accent-soft:#20403a; --mark:#ff6b5f; --scene:#192120;
+  --water:#5aaaf2; --est:#e3aa4f; --est-soft:#3a2e1a; --dim:#cfe0da; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:12px;box-sizing:border-box;overflow:hidden}
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr);gap:12px}
+.top{grid-column:1 / -1;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:20px;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{margin:2px 0 0;color:var(--muted);font-size:13px}
+.stage{position:relative;min-height:0;border-radius:10px;overflow:hidden;background:var(--scene);border:1px solid var(--line)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none}
+.hint{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);
+  padding:4px 8px;border-radius:6px;pointer-events:none;max-width:calc(100% - 20px)}
+.panel{min-height:0;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:18px}
+.panel h2{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.views{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.views button{font:500 13px var(--font-ui);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:6px;padding:7px 4px;cursor:pointer}
+.views button:hover{border-color:var(--accent)}
+.views button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.views button:focus-visible,.tog input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.views .wall{font-family:var(--font-num)}
+.togs{display:flex;flex-direction:column;gap:6px}
+.tog{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.tog input{position:absolute;opacity:0;pointer-events:none}
+.tog span{width:30px;height:18px;border-radius:9px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.tog span::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--panel);transition:transform .15s}
+.tog input:checked+span{background:var(--accent)}
+.tog input:checked+span::after{transform:translateX(12px)}
+.card{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.card .t{font-weight:600;font-size:15px}
+.card .d{font-family:var(--font-num);font-size:13px}
+.card .n{color:var(--muted);font-size:13px}
+.chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:10px;align-self:flex-start}
+.chip.m{background:var(--accent-soft);color:var(--accent)}
+.chip.e{background:var(--est-soft);color:var(--est)}
+dl.stats{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+dl.stats dt{color:var(--muted)}
+dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-numeric:tabular-nums}
+.legend p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.legend .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* étiquettes 3D */
+.wtag{font:600 26px var(--font-ui);color:var(--mark);text-shadow:0 0 3px var(--panel),0 0 6px var(--panel);transition:opacity .2s}
+.dtag{font:500 11px var(--font-num);color:var(--fg);background:var(--panel);border:1px solid var(--line);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.htag{font:500 11px var(--font-num);color:var(--est);background:var(--panel);border:1px dashed var(--est);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.qtag{font:500 11px var(--font-ui);color:var(--water);background:var(--panel);border:1px solid var(--water);padding:2px 6px;border-radius:4px;max-width:150px;text-align:center}
+
+@media (max-width:760px){
+  html,body{height:auto}
+  body{overflow:auto}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;height:auto}
+  .stage{height:62svh;min-height:340px}
+  .panel{overflow:visible}
+}
+@media (prefers-reduced-motion: reduce){.tog span,.tog span::after,.wtag{transition:none}}
+
+.dl{display:inline-block;font:500 13px var(--font-ui);color:var(--panel);background:var(--accent);border-radius:6px;padding:8px 12px;text-decoration:none}
+.dl:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>Salle de bain sous combles</h1>
+      <p class="sub">État actuel, cotes en cm. Murs A, B, C, D repérés comme sur vos croquis.</p>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div id="labels"></div>
+    <div class="hint">Glisser pour tourner · molette ou pincer pour zoomer · clic droit ou deux doigts pour décaler · toucher un élément pour ses mesures</div>
+  </main>
+
+  <aside class="panel">
+    <section>
+      <h2>Vues</h2>
+      <div class="views" id="views">
+        <button data-v="persp" aria-pressed="true">3D</button>
+        <button data-v="top">Dessus</button>
+        <button data-v="inside">Entrée</button>
+        <button data-v="A" class="wall">Mur A</button>
+        <button data-v="B" class="wall">Mur B</button>
+        <button data-v="C" class="wall">Mur C</button>
+        <button data-v="D" class="wall">Mur D</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Afficher</h2>
+      <div class="togs">
+        <label class="tog"><input type="checkbox" id="t-furn" checked><span></span>Mobilier et sanitaires actuels</label>
+        <label class="tog"><input type="checkbox" id="t-clad" checked><span></span>Carrelage et crépi actuels</label>
+        <label class="tog"><input type="checkbox" id="t-dims" checked><span></span>Cotes</label>
+        <label class="tog"><input type="checkbox" id="t-water" checked><span></span>Arrivées et évacuations d'eau</label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Élément sélectionné</h2>
+      <div class="card" id="sel"></div>
+    </section>
+
+    <section>
+      <h2>Pièce</h2>
+      <dl class="stats">
+        <dt>Sol</dt><dd>254 × 268</dd>
+        <dt>Surface hors gaine</dt><dd>6,32 m²</dd>
+        <dt>Dont à plus de 1,80 m</dt><dd>5,17 m²</dd>
+        <dt>Sous plafond</dt><dd>248</dd>
+        <dt>Mur bas (côté C)</dt><dd>135</dd>
+        <dt>Rampant</dt><dd>158 · 45°</dd>
+        <dt>Gaine (coin A/D)</dt><dd>98 × 50</dd>
+      </dl>
+    </section>
+
+    <section>
+      <h2>Murs à plat</h2>
+      <p class="sub" style="margin:0 0 8px">Les murs A, B, C, D et le plan au sol, à l'échelle, pour dessiner le projet.</p>
+      <a class="dl" href="salle-de-bain-murs-a-plat.pdf" target="_blank" rel="noopener">Ouvrir le PDF</a>
+    </section>
+
+    <section class="legend">
+      <h2>Fiabilité</h2>
+      <div class="row"><span class="chip m">Mesuré</span><span class="chip e">Estimé</span></div>
+      <p>La pièce, la porte, la gaine et la fenêtre viennent de vos croquis. Le mobilier et les zones d'eau sont placés d'après les photos et restent à confirmer.</p>
+    </section>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script>
+(() => {
+/* ---------- Géométrie de la pièce (cm) ----------
+   x : du mur D (x=0) au mur B (x=254)
+   z : du mur A (z=0) au mur bas C (z=268)
+   y : hauteur. Plafond plat à 248 de z=0 à z=155, puis rampant jusqu'à 135 en z=268. */
+const L = 254, P = 268, H = 248, KNEE = 135, FLAT = 155;
+const RUN = P - FLAT;                 // 113
+const SLOPE_LEN = Math.hypot(RUN, H - KNEE); // ≈ 160
+const K = RUN / SLOPE_LEN;
+const slopeAt = (u, s) => [u, KNEE + s * K, P - s * K];
+
+const stage = document.getElementById('stage');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- Rendu ---------- */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+stage.prepend(renderer.domElement);
+const labelR = new THREE.CSS2DRenderer();
+labelR.domElement.style.position = 'absolute';
+labelR.domElement.style.inset = '0';
+labelR.domElement.style.pointerEvents = 'none';
+document.getElementById('labels').appendChild(labelR.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 1, 6000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .09;
+controls.screenSpacePanning = true; controls.minDistance = 30; controls.maxDistance = 1500;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c2bd, .75));
+const sun = new THREE.DirectionalLight(0xffffff, .55); sun.position.set(400, 700, 300); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, .25); fill.position.set(-300, 300, -400); scene.add(fill);
+
+/* ---------- Textures dessinées ---------- */
+const S = 2; // px par cm
+let seed = 11;
+const R = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const rgb = (c, d) => `rgb(${c.map(k => Math.max(0, Math.min(255, Math.round(k + d)))).join(',')})`;
+const TILE = {
+  green: { base: [92, 140, 131], tw: 20, th: 20, grout: '#c2cec9', vary: 16 },
+  white: { base: [232, 231, 224], tw: 20, th: 25, grout: '#cbd0ca', vary: 7 },
+};
+function tiles(ctx, W, Hh, y0, y1, kind) {
+  const st = TILE[kind];
+  for (let v = y0; v < y1; v += st.th) for (let u = 0; u < W; u += st.tw) {
+    const top = Math.min(v + st.th, y1);
+    ctx.fillStyle = rgb(st.base, (R() - .5) * st.vary);
+    ctx.fillRect(u * S, (Hh - top) * S, st.tw * S, (top - v) * S);
+  }
+  ctx.strokeStyle = st.grout; ctx.lineWidth = 1.2; ctx.beginPath();
+  for (let v = y0; v <= y1 + .01; v += st.th) { const y = (Hh - Math.min(v, y1)) * S; ctx.moveTo(0, y); ctx.lineTo(W * S, y); }
+  for (let u = 0; u <= W; u += st.tw) { ctx.moveTo(u * S, (Hh - y1) * S); ctx.lineTo(u * S, (Hh - y0) * S); }
+  ctx.stroke();
+}
+function surfaceFill(ctx, W, Hh, y0, y1, kind) {
+  const y = (Hh - y1) * S, h = (y1 - y0) * S;
+  ctx.fillStyle = kind === 'paint' ? '#f1f0eb' : '#ebe8df';
+  ctx.fillRect(0, y, W * S, h);
+  if (kind === 'crepi') {
+    const cols = ['#8b9590', '#5c6c67', '#a9b4ae', '#43534e', '#7aa39a'];
+    const n = Math.round(W * (y1 - y0) * .32);
+    for (let i = 0; i < n; i++) {
+      ctx.fillStyle = cols[(R() * cols.length) | 0];
+      const r = .5 + R() * 1.3;
+      ctx.fillRect(R() * W * S, y + R() * h, r, r);
+    }
+  }
+}
+function cladTexture(W, Hh, bands) {
+  const c = document.createElement('canvas');
+  c.width = Math.ceil(W * S); c.height = Math.ceil(Hh * S);
+  const ctx = c.getContext('2d');
+  let from = 0;
+  for (const b of bands) {
+    const to = Math.min(b.to, Hh); if (to <= from) continue;
+    if (TILE[b.kind]) tiles(ctx, W, Hh, from, to, b.kind); else surfaceFill(ctx, W, Hh, from, to, b.kind);
+    from = to;
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.repeat.set(1 / W, 1 / Hh); t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return t;
+}
+function floorTexture(W, D) {
+  const c = document.createElement('canvas');
+  c.width = W * S; c.height = D * S;
+  const ctx = c.getContext('2d');
+  ctx.save(); ctx.rotate(Math.PI / 4);
+  const t = 30 * S, span = (W + D) * S;
+  for (let i = -span; i < span; i += t) for (let j = -span; j < span; j += t) {
+    const k = ((Math.round(i / t) + Math.round(j / t)) & 1);
+    ctx.fillStyle = k ? rgb([96, 142, 132], (R() - .5) * 14) : rgb([226, 231, 226], (R() - .5) * 6);
+    ctx.fillRect(i, j, t, t);
+    ctx.strokeStyle = '#b9c4bf'; ctx.lineWidth = 1.2; ctx.strokeRect(i, j, t, t);
+  }
+  ctx.restore();
+  const tx = new THREE.CanvasTexture(c);
+  tx.repeat.set(1 / W, 1 / D); tx.encoding = THREE.sRGBEncoding;
+  tx.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tx;
+}
+
+/* ---------- Surfaces de la pièce ---------- */
+const walls = [];
+const pickables = [];
+function surface(pts, holes, map3, inward, W, Hh, tex, opts = {}) {
+  const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1])));
+  (holes || []).forEach(h => shape.holes.push(new THREE.Path(h.map(p => new THREE.Vector2(p[0], p[1])))));
+  const g = new THREE.ShapeGeometry(shape);
+  const pos = g.attributes.position;
+  for (let i = 0; i < pos.count; i++) { const p = map3(pos.getX(i), pos.getY(i)); pos.setXYZ(i, p[0], p[1], p[2]); }
+  g.computeVertexNormals();
+  const n = new THREE.Vector3().fromBufferAttribute(g.attributes.normal, 0);
+  if (n.dot(inward) < 0) {
+    const ix = g.index.array;
+    for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; }
+    g.index.needsUpdate = true; g.computeVertexNormals();
+  }
+  const mat = new THREE.MeshStandardMaterial({ map: tex, color: 0xffffff, roughness: .92, side: THREE.DoubleSide, transparent: true });
+  const mesh = new THREE.Mesh(g, mat);
+  scene.add(mesh);
+  const w = { mesh, mat, tex, plain: opts.plain || '#e5e4de', inward: inward.clone().normalize(),
+    point: new THREE.Vector3(...map3(pts[0][0], pts[0][1])), fade: opts.fade !== false, op: 1, extra: [], tag: null };
+  mesh.userData = { info: opts.info, wall: w };
+  walls.push(w); pickables.push(mesh);
+  return w;
+}
+
+const INFO = {
+  room: { t: 'Salle de bain', d: '254 × 268 au sol · 248 sous plafond', s: 'm', n: "Touchez un mur ou un meuble pour voir ses mesures. Les murs situés entre vous et la pièce s'effacent tout seuls." },
+  A: { t: 'Mur A · porte', d: '254 de long (dont gaine 98) · h. 248', s: 'm', n: "Porte de 80 × 210 qui s'ouvre vers l'intérieur, gonds côté gaine." },
+  B: { t: 'Mur B · lavabo', d: '268 × 248, mur bas 135 côté C', s: 'm', n: "L'arrivée et l'évacuation du lavabo sont dans ce mur. Leur position exacte n'est pas connue." },
+  C: { t: 'Mur C · mur bas', d: '254 × 135', s: 'm', n: 'Radiateur au pied, rampant avec fenêtre de toit au-dessus.' },
+  slope: { t: 'Rampant côté C', d: '254 × 158 · pente 45°', s: 'm', n: 'Il descend du plafond (248) au mur bas (135).' },
+  D: { t: 'Mur D · bain / douche', d: '268 × 248 (218 libres + gaine 50)', s: 'm', n: "L'arrivée et l'évacuation de la douche sont de ce côté." },
+  box: { t: 'Gaine (coffrage)', d: '98 × 50 · toute hauteur', s: 'm', n: 'Coin A/D. La robinetterie et la barre de douche sont fixées sur sa face côté baignoire.' },
+  ceil: { t: 'Plafond', d: '254 × 155 à 248', s: 'm' },
+  floor: { t: 'Sol', d: '254 × 268 · 6,32 m² hors gaine', s: 'm', n: 'Dont 5,17 m² à plus de 1,80 m sous rampant (ligne pointillée).' },
+  door: { t: 'Porte', d: '80 × 210', s: 'm', n: "S'ouvre vers l'intérieur. Débattement de 80 cm (quart de cercle au sol)." },
+  win: { t: 'Fenêtre de toit', d: '≈ 47 × 72 · ébrasement 28', s: 'e', n: 'Dimensions du croquis. La position le long du mur C est estimée à partir des photos.' },
+  bath: { t: 'Baignoire', d: '≈ 170 × 72 · h. 55', s: 'e', n: 'Le long du mur D, entre la gaine et la tablette carrelée.' },
+  ledge: { t: 'Tablette carrelée', d: '≈ 48 × 72 · h. 55', s: 'e', n: 'Au bout de la baignoire, sous le rampant, avec un rangement ouvert dessous.' },
+  screen: { t: 'Pare-baignoire vitré', d: '≈ 75 × 140', s: 'e' },
+  mixer: { t: 'Robinetterie bain-douche', d: 'barre ≈ 100 de haut', s: 'e', n: 'Sur la face de la gaine.' },
+  shelf: { t: 'Étagère en bois', d: '≈ 68 × 35 × 175', s: 'e' },
+  column: { t: 'Colonne de rangement', d: '≈ 38 × 35 × 175', s: 'e' },
+  vanity: { t: 'Meuble vasque', d: '≈ 70 × 48 · plan à 87', s: 'e' },
+  counter: { t: 'Plan de toilette', d: '≈ 140 × 52', s: 'e', n: 'Prolongé jusque sous le rampant.' },
+  drawers: { t: 'Bloc tiroirs', d: '≈ 44 × 42', s: 'e' },
+  mirror: { t: 'Miroir et bandeau lumineux', d: '≈ 68 × 80', s: 'e' },
+  rad: { t: 'Radiateur', d: '≈ 60 × 60', s: 'e', n: 'Au pied du mur C, à côté de la tablette.' },
+  light: { t: 'Plafonnier', d: '3 spots', s: 'e' },
+  vmc: { t: 'Bouche de VMC', d: 'Ø ≈ 15', s: 'e' },
+  wB: { t: 'Eau · lavabo', d: 'Zone approximative', s: 'e', n: 'Arrivée et évacuation dans le mur B, sous la vasque. Position exacte inconnue (réseau caché).' },
+  wD: { t: 'Eau · bain / douche', d: 'Zone approximative', s: 'e', n: 'Arrivée et évacuation côté mur D, au niveau de la robinetterie et de la bonde. Position exacte inconnue.' },
+};
+
+// Plafond
+surface([[0, 0], [L, 0], [L, FLAT], [0, FLAT]], null, (u, v) => [u, H, v], new THREE.Vector3(0, -1, 0), L, FLAT,
+  cladTexture(L, FLAT, [{ to: 999, kind: 'crepi' }]), { info: INFO.ceil, plain: '#eeede8' });
+// Sol
+surface([[0, 0], [L, 0], [L, P], [0, P]], null, (u, v) => [u, 0, v], new THREE.Vector3(0, 1, 0), L, P,
+  floorTexture(L, P), { info: INFO.floor, plain: '#d6d4cc' });
+// Mur A : à droite de la gaine, ouverture de porte 80 × 210 contre la gaine
+const wA = surface([[178, 0], [L, 0], [L, H], [98, H], [98, 210], [178, 210]], null, (u, v) => [u, v, 0],
+  new THREE.Vector3(0, 0, 1), L, H, cladTexture(L, H, [{ to: 69, kind: 'green' }, { to: 157, kind: 'white' }, { to: 999, kind: 'crepi' }]), { info: INFO.A });
+// Mur B
+const prof = [[0, 0], [P, 0], [P, KNEE], [FLAT, H], [0, H]];
+const wB = surface(prof, null, (u, v) => [L, v, u], new THREE.Vector3(-1, 0, 0), P, H,
+  cladTexture(P, H, [{ to: 65, kind: 'green' }, { to: 150, kind: 'white' }, { to: 999, kind: 'crepi' }]), { info: INFO.B });
+// Mur D
+const wD = surface(prof, null, (u, v) => [0, v, u], new THREE.Vector3(1, 0, 0), P, H,
+  cladTexture(P, H, [{ to: 75, kind: 'green' }, { to: 160, kind: 'white' }, { to: 999, kind: 'paint' }]), { info: INFO.D });
+// Mur bas C
+const wC = surface([[0, 0], [L, 0], [L, KNEE], [0, KNEE]], null, (u, v) => [u, v, P], new THREE.Vector3(0, 0, -1), L, KNEE,
+  cladTexture(L, KNEE, [{ to: 70, kind: 'green' }, { to: 999, kind: 'white' }]), { info: INFO.C });
+// Rampant avec fenêtre de toit
+const WIN = { u0: 148, u1: 195, s0: 28, s1: 100 };
+const wS = surface([[0, 0], [L, 0], [L, SLOPE_LEN], [0, SLOPE_LEN]],
+  [[[WIN.u0, WIN.s0], [WIN.u1, WIN.s0], [WIN.u1, WIN.s1], [WIN.u0, WIN.s1]]],
+  (u, s) => slopeAt(u, s), new THREE.Vector3(0, -1, -1), L, SLOPE_LEN,
+  cladTexture(L, SLOPE_LEN, [{ to: 999, kind: 'crepi' }]), { info: INFO.slope });
+// Gaine : face côté baignoire (z=50) et face côté porte (x=98), plus le dessus
+const boxFront = surface([[0, 0], [98, 0], [98, H], [0, H]], null, (u, v) => [u, v, 50], new THREE.Vector3(0, 0, 1), 98, H,
+  cladTexture(98, H, [{ to: 75, kind: 'green' }, { to: 160, kind: 'white' }, { to: 999, kind: 'paint' }]), { info: INFO.box, fade: false });
+const boxSide = surface([[0, 0], [50, 0], [50, H], [0, H]], null, (u, v) => [98, v, u], new THREE.Vector3(1, 0, 0), 50, H,
+  cladTexture(50, H, [{ to: 70, kind: 'green' }, { to: 160, kind: 'white' }, { to: 999, kind: 'paint' }]), { info: INFO.box, fade: false });
+const boxTop = new THREE.Mesh(new THREE.PlaneGeometry(98, 50), new THREE.MeshStandardMaterial({ color: 0xc9ccc6, side: THREE.DoubleSide }));
+boxTop.rotation.x = -Math.PI / 2; boxTop.position.set(49, H - .3, 25); boxTop.userData.info = INFO.box;
+scene.add(boxTop); pickables.push(boxTop);
+
+// Ébrasement et vitrage de la fenêtre (suivent l'effacement du rampant)
+function quad(a, b, c, d, mat) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute([...a, ...b, ...c, ...a, ...c, ...d], 3));
+  g.computeVertexNormals();
+  return new THREE.Mesh(g, mat);
+}
+{
+  const o = [0, 28 / Math.SQRT2, 28 / Math.SQRT2];
+  const add = (p, f) => [p[0] + o[0] * f, p[1] + o[1] * f, p[2] + o[2] * f];
+  const c = [slopeAt(WIN.u0, WIN.s0), slopeAt(WIN.u1, WIN.s0), slopeAt(WIN.u1, WIN.s1), slopeAt(WIN.u0, WIN.s1)];
+  const rev = new THREE.MeshStandardMaterial({ color: 0xebe8df, side: THREE.DoubleSide, transparent: true });
+  for (let i = 0; i < 4; i++) {
+    const a = c[i], b = c[(i + 1) % 4];
+    const m = quad(a, b, add(b, 1), add(a, 1), rev); m.userData.info = INFO.win; scene.add(m); pickables.push(m);
+  }
+  const wood = new THREE.MeshStandardMaterial({ color: 0x9a6a3c, side: THREE.DoubleSide, transparent: true });
+  const fr = quad(add(c[0], .98), add(c[1], .98), add(c[2], .98), add(c[3], .98), wood); scene.add(fr);
+  const gi = [slopeAt(WIN.u0 + 4, WIN.s0 + 4), slopeAt(WIN.u1 - 4, WIN.s0 + 4), slopeAt(WIN.u1 - 4, WIN.s1 - 4), slopeAt(WIN.u0 + 4, WIN.s1 - 4)];
+  const glassM = new THREE.MeshBasicMaterial({ color: 0xcfe5f4, side: THREE.DoubleSide, transparent: true });
+  const gl = quad(add(gi[0], .95), add(gi[1], .95), add(gi[2], .95), add(gi[3], .95), glassM);
+  gl.userData.info = INFO.win; scene.add(gl); pickables.push(gl, fr); fr.userData.info = INFO.win;
+  wS.extra.push(rev, wood, glassM);
+}
+
+/* ---------- Porte ---------- */
+function box(x0, x1, y0, y1, z0, z1, color, opts = {}) {
+  const mat = opts.mat || new THREE.MeshStandardMaterial({ color, roughness: opts.rough ?? .6, metalness: opts.metal ?? 0 });
+  const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat);
+  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  (opts.parent || scene).add(m);
+  if (opts.info) { m.userData.info = opts.info; pickables.push(m); }
+  return m;
+}
+const struct = new THREE.Group(); scene.add(struct);
+box(178, 184, 0, 216, -1, 2, 0xf4f3ee, { parent: struct, info: INFO.door });
+box(98, 184, 210, 216, -1, 2, 0xf4f3ee, { parent: struct, info: INFO.door });
+const doorPivot = new THREE.Group(); doorPivot.position.set(99, 0, 1); doorPivot.rotation.y = -0.42; struct.add(doorPivot);
+box(0, 79, 0, 208, 0, 4, 0xf6f5f0, { parent: doorPivot, info: INFO.door });
+for (const [y0, y1] of [[20, 90], [110, 150], [165, 195]]) for (const [x0, x1] of [[8, 37], [42, 71]])
+  box(x0, x1, y0, y1, 4, 4.8, 0xebe9e2, { parent: doorPivot, info: INFO.door });
+box(70, 76, 102, 106, 4, 9, 0xb9bcbc, { parent: doorPivot, metal: .7, rough: .3, info: INFO.door });
+
+/* ---------- Mobilier et sanitaires actuels ---------- */
+const furn = new THREE.Group(); scene.add(furn);
+const F = { parent: furn };
+const greenTileMat = (w, h) => { const t = cladTexture(w, h, [{ to: 999, kind: 'green' }]); t.repeat.set(1, 1); return new THREE.MeshStandardMaterial({ map: t, roughness: .7 }); };
+// Baignoire + tablier carrelé
+box(0, 72, 0, 55, 50, 220, 0, { ...F, mat: greenTileMat(170, 55), info: INFO.bath });
+box(0, 72, 55, 57, 50, 220, 0xf7f7f4, { ...F, rough: .3, info: INFO.bath });
+{
+  const sh = new THREE.Shape(); const w = 58, d = 150, r = 22, x = -w / 2, y = -d / 2;
+  sh.moveTo(x + r, y); sh.lineTo(x + w - r, y); sh.quadraticCurveTo(x + w, y, x + w, y + r); sh.lineTo(x + w, y + d - r);
+  sh.quadraticCurveTo(x + w, y + d, x + w - r, y + d); sh.lineTo(x + r, y + d); sh.quadraticCurveTo(x, y + d, x, y + d - r);
+  sh.lineTo(x, y + r); sh.quadraticCurveTo(x, y, x + r, y);
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshStandardMaterial({ color: 0xdfe4e3, roughness: .35 }));
+  m.rotation.x = -Math.PI / 2; m.position.set(36, 57.15, 135); m.userData.info = INFO.bath; furn.add(m); pickables.push(m);
+  const drain = new THREE.Mesh(new THREE.CircleGeometry(3, 20), new THREE.MeshStandardMaterial({ color: 0x8d9696, metalness: .6, roughness: .3 }));
+  drain.rotation.x = -Math.PI / 2; drain.position.set(36, 57.3, 68); furn.add(drain);
+}
+// Tablette carrelée en bout de baignoire
+box(0, 72, 0, 55, 220, P, 0, { ...F, mat: greenTileMat(48, 55), info: INFO.ledge });
+box(0, 72, 55, 57, 220, P, 0xdfe6e1, { ...F, info: INFO.ledge });
+box(30, 72.5, 4, 40, 228, 262, 0x30403c, { ...F, info: INFO.ledge });
+// Pare-baignoire
+{
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(75, 140), new THREE.MeshStandardMaterial({ color: 0xcfe3e3, transparent: true, opacity: .35, roughness: .1, side: THREE.DoubleSide, depthWrite: false }));
+  m.rotation.y = Math.PI / 2; m.position.set(70, 127, 52 + 37.5); m.userData.info = INFO.screen; furn.add(m); pickables.push(m);
+  box(69.5, 70.5, 57, 197, 50.5, 53, 0xf4f4f0, { ...F, info: INFO.screen });
+}
+// Robinetterie et barre de douche sur la gaine
+const chrome = { metal: .8, rough: .25 };
+box(25, 55, 72, 78, 50, 56, 0xc4cacb, { ...F, ...chrome, info: INFO.mixer });
+box(38, 41, 112, 218, 50.5, 53.5, 0xc4cacb, { ...F, ...chrome, info: INFO.mixer });
+{
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(6, 5, 3, 24), new THREE.MeshStandardMaterial({ color: 0xc4cacb, metalness: .8, roughness: .25 }));
+  head.position.set(39.5, 186, 60); head.rotation.x = .5; head.userData.info = INFO.mixer; furn.add(head); pickables.push(head);
+}
+// Étagère en bois
+{
+  const wood = new THREE.MeshStandardMaterial({ color: 0xa9733d, roughness: .75 });
+  for (const [x, z] of [[219, 8], [251, 8], [219, 73], [251, 73]]) box(x, x + 3, 0, 175, z, z + 3, 0, { ...F, mat: wood, info: INFO.shelf });
+  for (const y of [8, 45, 82, 118, 152, 172]) box(219, 254, y, y + 2.5, 8, 76, 0, { ...F, mat: wood, info: INFO.shelf });
+}
+// Colonne
+const whiteF = 0xf3f2ec;
+box(220, 254, 20, 195, 82, 120, whiteF, { ...F, info: INFO.column });
+box(219.4, 220, 140, 190, 84, 118, 0xe7e5de, { ...F, info: INFO.column });
+{
+  const mm = new THREE.Mesh(new THREE.CircleGeometry(6.5, 24), new THREE.MeshStandardMaterial({ color: 0xbfcfd2, metalness: .5, roughness: .15 }));
+  mm.rotation.y = -Math.PI / 2; mm.position.set(219.2, 168, 101); furn.add(mm);
+}
+// Meuble vasque, plan, tiroirs
+box(206, 254, 22, 84, 120, 190, whiteF, { ...F, info: INFO.vanity });
+box(205.4, 206, 28, 80, 154.6, 155.4, 0xcfcdc6, { ...F, info: INFO.vanity });
+box(202, 254, 84, 88, 118, 258, 0xeceae3, { ...F, rough: .4, info: INFO.counter });
+{
+  const sh = new THREE.Shape(); sh.absellipse(0, 0, 18, 24, 0, Math.PI * 2, false, 0);
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(sh, 32), new THREE.MeshStandardMaterial({ color: 0xdfe4e3, roughness: .3 }));
+  m.rotation.x = -Math.PI / 2; m.position.set(228, 88.15, 155); m.userData.info = INFO.vanity; furn.add(m); pickables.push(m);
+  box(246, 249, 88, 100, 153, 157, 0xc4cacb, { ...F, ...chrome, info: INFO.vanity });
+}
+box(212, 254, 34, 84, 212, 256, whiteF, { ...F, info: INFO.drawers });
+for (const y of [46.5, 59, 71.5]) box(211.4, 212, y - .4, y + .4, 214, 254, 0xcfcdc6, { ...F, info: INFO.drawers });
+// Miroir et bandeau
+{
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(68, 80), new THREE.MeshStandardMaterial({ color: 0xc6d3d6, metalness: .35, roughness: .12 }));
+  m.rotation.y = -Math.PI / 2; m.position.set(252.6, 145, 156); m.userData.info = INFO.mirror; furn.add(m); pickables.push(m);
+  box(238, 254, 185, 192, 120, 192, whiteF, { ...F, info: INFO.mirror });
+}
+// Radiateur
+{
+  const c = document.createElement('canvas'); c.width = 64; c.height = 8; const x = c.getContext('2d');
+  x.fillStyle = '#f2efe6'; x.fillRect(0, 0, 64, 8); x.fillStyle = '#d8d3c6'; for (let i = 0; i < 64; i += 4) x.fillRect(i, 0, 1.5, 8);
+  const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.repeat.set(6, 1); t.encoding = THREE.sRGBEncoding;
+  box(85, 145, 15, 75, 258, 266, 0, { ...F, mat: new THREE.MeshStandardMaterial({ map: t, roughness: .5 }), info: INFO.rad });
+  box(147, 149, 0, 85, 262, 265, 0x3b3b3b, { ...F, info: INFO.rad });
+}
+// Plafonnier et VMC
+{
+  const base = box(118, 136, H - 2, H, 70, 88, 0xeeeeea, { ...F, info: INFO.light });
+  const bulb = new THREE.MeshStandardMaterial({ color: 0xfff3d6, emissive: 0xffe2a8, emissiveIntensity: .8 });
+  for (const [dx, dz] of [[-5, -3], [5, -2], [0, 5]]) {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(3.6, 16, 12), bulb); b.position.set(127 + dx, H - 9, 79 + dz); b.userData.info = INFO.light; furn.add(b); pickables.push(b);
+  }
+  const v = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 2, 24), new THREE.MeshStandardMaterial({ color: 0xf2f2ee }));
+  v.position.set(24, H - 1, 68); v.userData.info = INFO.vmc; furn.add(v); pickables.push(v);
+}
+
+/* ---------- Zones d'eau (approximatives, visibles à travers) ---------- */
+const water = new THREE.Group(); scene.add(water);
+const tags = [];
+function label(text, cls, pos, group) {
+  const el = document.createElement('div'); el.className = cls; el.textContent = text;
+  const o = new THREE.CSS2DObject(el); o.position.set(...pos); (group || scene).add(o); return o;
+}
+function waterZone(x0, x1, y0, y1, z0, z1, info, text, lp) {
+  const col = new THREE.Color(css('--water') || '#2a7fd4');
+  const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0),
+    new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .28, depthTest: false }));
+  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.renderOrder = 10; m.userData.info = info;
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: col, depthTest: false }));
+  e.renderOrder = 11; m.add(e); water.add(m); pickables.push(m);
+  label(text, 'qtag', lp, water);
+  return [m.material, e.material];
+}
+const waterMats = [
+  ...waterZone(238, 254, 25, 75, 135, 178, INFO.wB, 'Lavabo : arrivée + évacuation (zone approx.)', [246, 98, 156]),
+  ...waterZone(0, 18, 4, 62, 52, 98, INFO.wD, 'Bain / douche : arrivée + évacuation (zone approx.)', [8, 98, 74]),
+];
+
+/* ---------- Cotes ---------- */
+const dims = new THREE.Group(); scene.add(dims);
+const dimMat = new THREE.LineBasicMaterial({ color: 0x22403a, depthTest: false, transparent: true });
+const dashMat = new THREE.LineDashedMaterial({ color: 0xa86a12, dashSize: 6, gapSize: 4, depthTest: false, transparent: true });
+function dimLine(a, b, text, tick = [0, 1, 0]) {
+  const t = tick.map(v => v * 4);
+  const pts = [a, b, a.map((v, i) => v - t[i]), a.map((v, i) => v + t[i]), b.map((v, i) => v - t[i]), b.map((v, i) => v + t[i])];
+  const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+  const l = new THREE.LineSegments(g, dimMat); l.renderOrder = 12; dims.add(l);
+  label(text, 'dtag', a.map((v, i) => (v + b[i]) / 2), dims);
+}
+dimLine([0, .5, P - 2], [L, .5, P - 2], '254', [0, 0, 1]);
+dimLine([L - 2, .5, 0], [L - 2, .5, P], '268', [1, 0, 0]);
+dimLine([L, 0, 0], [L, H, 0], '248', [1, 0, 0]);
+dimLine([L, 0, P], [L, KNEE, P], '135', [1, 0, 0]);
+dimLine([L, H, 0], [L, H, FLAT], '155', [1, 0, 0]);
+dimLine([L, H, FLAT], [L, KNEE, P], 'rampant 158', [1, 0, 0]);
+dimLine([98, 218, 0], [178, 218, 0], 'porte 80 × 210', [1, 0, 0]);
+dimLine([0, .5, 50], [98, .5, 50], '98', [0, 0, 1]);
+dimLine([98, .5, 0], [98, .5, 50], '50', [1, 0, 0]);
+// Ligne des 1,80 m sous rampant (au sol)
+{
+  const z = P - (180 - KNEE);
+  const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, .6, z), new THREE.Vector3(L, .6, z)]);
+  const l = new THREE.Line(g, dashMat); l.computeLineDistances(); l.renderOrder = 12; dims.add(l);
+  label('h. 1,80 m sous rampant', 'htag', [150, .6, z], dims);
+}
+// Débattement de la porte
+{
+  const arcM = new THREE.MeshBasicMaterial({ color: 0x22403a, transparent: true, opacity: .07, depthWrite: false, side: THREE.DoubleSide });
+  const sec = new THREE.Mesh(new THREE.CircleGeometry(80, 32, -Math.PI / 2, Math.PI / 2), arcM);
+  sec.rotation.x = -Math.PI / 2; sec.position.set(99, .4, 1); dims.add(sec);
+  const arc = new THREE.Mesh(new THREE.RingGeometry(79.3, 80, 48, 1, -Math.PI / 2, Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x22403a, side: THREE.DoubleSide, transparent: true, opacity: .5 }));
+  arc.rotation.x = -Math.PI / 2; arc.position.set(99, .45, 1); dims.add(arc);
+  dims.userData.arcMats = [arcM, arc.material];
+}
+
+/* ---------- Lettres des murs ---------- */
+wA.tag = label('A', 'wtag', [176, 232, 1], scene);
+wB.tag = label('B', 'wtag', [L - 1, 222, 70], scene);
+wC.tag = label('C', 'wtag', [40, 112, P - 1], scene);
+wD.tag = label('D', 'wtag', [1, 222, 150], scene);
+
+/* ---------- Thème ---------- */
+function applyTheme() {
+  scene.background = new THREE.Color(css('--scene') || '#e3e7e2');
+  const d = new THREE.Color(css('--dim') || '#22403a');
+  dimMat.color.copy(d); dims.userData.arcMats.forEach(m => m.color.copy(d));
+  dashMat.color.set(css('--est') || '#a86a12');
+  const w = new THREE.Color(css('--water') || '#2a7fd4'); waterMats.forEach(m => m.color.copy(w));
+}
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ---------- Vues ---------- */
+const VIEWS = {
+  persp: { p: [-210, 320, P + 190], t: [150, 60, 100] },
+  top: { p: [127, 760, 136], t: [127, 0, 134] },
+  inside: { p: [205, 160, 18], t: [70, 85, 210] },
+  A: { p: [127, 150, P + 430], t: [127, 120, 0] },
+  B: { p: [-430, 150, 134], t: [L, 120, 134] },
+  C: { p: [127, 170, -430], t: [127, 105, P] },
+  D: { p: [L + 430, 150, 134], t: [0, 120, 134] },
+};
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let tween = null;
+function go(name, instant) {
+  const v = VIEWS[name];
+  document.querySelectorAll('#views button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === name));
+  const to = { p: new THREE.Vector3(...v.p), t: new THREE.Vector3(...v.t) };
+  if (instant || reduce) { camera.position.copy(to.p); controls.target.copy(to.t); controls.update(); return; }
+  tween = { from: { p: camera.position.clone(), t: controls.target.clone() }, to, t0: performance.now(), dur: 700 };
+}
+document.getElementById('views').addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(b.dataset.v); });
+controls.addEventListener('start', () => { tween = null; document.querySelectorAll('#views button').forEach(b => b.setAttribute('aria-pressed', 'false')); });
+
+/* ---------- Bascules ---------- */
+function setGroup(g, on) { g.visible = on; g.traverse(o => { if (o.isCSS2DObject) o.visible = on; }); }
+document.getElementById('t-furn').addEventListener('change', e => setGroup(furn, e.target.checked));
+document.getElementById('t-dims').addEventListener('change', e => setGroup(dims, e.target.checked));
+document.getElementById('t-water').addEventListener('change', e => setGroup(water, e.target.checked));
+document.getElementById('t-clad').addEventListener('change', e => {
+  const on = e.target.checked;
+  walls.forEach(w => { w.mat.map = on ? w.tex : null; w.mat.color.set(on ? '#ffffff' : w.plain); w.mat.needsUpdate = true; });
+});
+
+/* ---------- Sélection ---------- */
+const sel = document.getElementById('sel');
+let picked = null;
+function showInfo(info) {
+  const i = info || INFO.room;
+  sel.innerHTML = '';
+  const add = (cls, txt, tag = 'div') => { const el = document.createElement(tag); el.className = cls; el.textContent = txt; sel.appendChild(el); return el; };
+  add('t', i.t); add('d', i.d);
+  add('chip ' + (i.s === 'm' ? 'm' : 'e'), i.s === 'm' ? 'Mesuré' : 'Estimé', 'span');
+  if (i.n) add('n', i.n);
+}
+showInfo();
+function visibleChain(o) { for (; o; o = o.parent) if (!o.visible) return false; return true; }
+function highlight(mesh, on) {
+  const m = mesh && mesh.material; if (!m || !m.emissive) return;
+  if (on) { mesh.userData.prevEm = m.emissive.getHex(); m.emissive.set(css('--accent') || '#2c6c5f'); m.emissiveIntensity = .35; }
+  else { m.emissive.setHex(mesh.userData.prevEm || 0); m.emissiveIntensity = 1; }
+}
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickables, false).find(h => {
+    const w = h.object.userData.wall; if (w && w.op < .5) return false;
+    if (h.object.material && h.object.material.opacity < .2 && !h.object.userData.info) return false;
+    return visibleChain(h.object);
+  });
+  if (picked) highlight(picked, false);
+  picked = hit ? hit.object : null;
+  if (picked) highlight(picked, true);
+  showInfo(picked && picked.userData.info);
+});
+
+/* ---------- Boucle ---------- */
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false); labelR.setSize(w, h);
+  camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage); resize();
+go('persp', true);
+
+const tmp = new THREE.Vector3();
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+function frame(now) {
+  if (tween) {
+    const k = Math.min(1, (now - tween.t0) / tween.dur), e = ease(k);
+    camera.position.lerpVectors(tween.from.p, tween.to.p, e);
+    controls.target.lerpVectors(tween.from.t, tween.to.t, e);
+    if (k >= 1) tween = null;
+  }
+  controls.update();
+  for (const w of walls) {
+    if (!w.fade) continue;
+    const d = tmp.copy(camera.position).sub(w.point).dot(w.inward);
+    const target = d < 0 ? .07 : 1;
+    w.op += (target - w.op) * (reduce ? 1 : .2);
+    w.mat.opacity = w.op; w.mat.depthWrite = w.op > .6;
+    w.extra.forEach(m => { m.opacity = w.op; m.depthWrite = w.op > .6; });
+    if (w.tag) w.tag.element.style.opacity = w.op < .5 ? .3 : 1;
+  }
+  renderer.render(scene, camera);
+  labelR.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
