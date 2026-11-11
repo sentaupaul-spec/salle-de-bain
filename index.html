@@ -164,6 +164,7 @@ dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-n
         <dt>Gaine (coin A/D)</dt><dd>98 × 50</dd>
         <dt>Douche (projet)</dt><dd>140 × 90</dd>
         <dt>Passage douche</dt><dd>70</dd>
+        <dt>Passage cloison ↔ banc</dt><dd>45</dd>
         <dt>Bord des vasques</dt><dd>h. 90</dd>
         <dt>Plan du meuble</dt><dd>h. 76</dd>
       </dl>
@@ -583,7 +584,7 @@ const projDims = new THREE.Group(); scene.add(projDims);
 const PJ = { parent: proj };
 const IP = {
   shower: { t: "Douche à l'italienne", d: '140 × 90 (78 utiles devant le muret)', s: 'p', n: "Le long du mur D, de la gaine au mur des rangements. Caniveau d'évacuation au pied du muret. Membrane d'étanchéité sol et murs." },
-  partition: { t: 'Cloison de douche', d: '70 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 1,65 m, puis verre fixe cannelé jusqu'au plafond pour la lumière. Laisse 70 cm de passage." },
+  partition: { t: 'Cloison de douche', d: '70 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 2,06 m, puis verre fixe cannelé sur les 42 derniers cm jusqu'au plafond, pour la lumière. Laisse 70 cm de passage." },
   ledge: { t: 'Muret-tablette', d: '12 de profondeur · h. 130', s: 'p', n: 'Collé au mur D sur toute la longueur de la douche. Il cache les tuyaux, reçoit la robinetterie et sert de tablette.' },
   mixer: { t: 'Colonne thermostatique', d: 'mitigeur à 105 · douchette sur barre', s: 'p', n: "Mitigeur thermostatique (anti-brûlure) sur le muret, douchette à main sur barre pour se doucher assis et rincer la douche, douche de tête sur bras." },
   rain: { t: 'Douche de tête sur bras', d: 'bras sur la gaine · pomme Ø 25 à ≈ 2,08 m', s: 'p' },
@@ -634,13 +635,13 @@ boxFront.projTex = tiles2(98, H, 60, 120, [221, 210, 195], '#c9bca9');
 box(12, 98, 0, .6, 50, 190, 0xd6ccbe, { ...PJ, rough: .7, info: IP.shower });
 box(16, 22, .6, .9, 58, 146, 0xa88a5c, { ...PJ, metal: .6, rough: .3, info: IP.shower });
 box(0, 12, 0, 130, 50, 190, 0xd9cebf, { ...PJ, info: IP.ledge });
-box(90, 98, 0, 165, 50, 120, 0xe3dacd, { ...PJ, info: IP.partition });
+box(90, 98, 0, 206, 50, 120, 0xe3dacd, { ...PJ, info: IP.partition });
 {
   // Verre fixe cannelé au-dessus de la partie pleine
   const c = document.createElement('canvas'); c.width = 64; c.height = 8; const x = c.getContext('2d');
   x.fillStyle = '#dcebef'; x.fillRect(0, 0, 64, 8); x.fillStyle = '#b8d0d6'; for (let i = 0; i < 64; i += 8) x.fillRect(i, 0, 2, 8);
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9, 1); t.encoding = THREE.sRGBEncoding;
-  box(92.5, 95.5, 165, H, 50, 120, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .6, roughness: .15 }), info: IP.partition });
+  box(92.5, 95.5, 206, H, 50, 120, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .6, roughness: .15 }), info: IP.partition });
 }
 // Colonne thermostatique : barre mitigeur sur le muret, douchette sur barre au-dessus
 const laiton = { metal: .7, rough: .35 };
@@ -723,6 +724,13 @@ dimLine([0, 1, 194], [90, 1, 194], '90', [0, 0, 1], projDims);
 dimLine([104, 1, 50], [104, 1, 120], 'cloison 70', [1, 0, 0], projDims);
 dimLine([104, 1, 120], [104, 1, 190], 'passage 70', [1, 0, 0], projDims);
 dimLine([193, 1, 2], [193, 1, 266], 'meuble 264', [1, 0, 0], projDims);
+// Passage réel en diagonale : du bout de la cloison (côté douche) au point le plus proche de l'arrondi du banc
+{
+  const p0 = [90, 120], c = [47, 175], r = 25;
+  const dx = p0[0] - c[0], dz = p0[1] - c[1], d = Math.hypot(dx, dz);
+  const q = [c[0] + r * dx / d, c[1] + r * dz / d];
+  dimLine([p0[0], 47, p0[1]], [q[0], 47, q[1]], 'passage diagonal ' + Math.round(d - r), [0, 1, 0], projDims);
+}
 
 /* ---------- Lettres des murs ---------- */
 wA.tag = label('A', 'wtag', [176, 232, 1], scene);
