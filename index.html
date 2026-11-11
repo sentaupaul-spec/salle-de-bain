@@ -163,8 +163,8 @@ dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-n
         <dt>Rampant</dt><dd>158 · 45°</dd>
         <dt>Gaine (coin A/D)</dt><dd>98 × 50</dd>
         <dt>Douche (projet)</dt><dd>140 × 90</dd>
-        <dt>Passage douche</dt><dd>80</dd>
-        <dt>Passage cloison ↔ banc</dt><dd>59</dd>
+        <dt>Passage douche</dt><dd>70</dd>
+        <dt>Passage cloison ↔ banc</dt><dd>51</dd>
         <dt>Bord des vasques</dt><dd>h. 90</dd>
         <dt>Plan du meuble</dt><dd>h. 76</dd>
       </dl>
@@ -584,11 +584,11 @@ const projDims = new THREE.Group(); scene.add(projDims);
 const PJ = { parent: proj };
 const IP = {
   shower: { t: "Douche à l'italienne", d: '140 × 90 (78 utiles devant le muret)', s: 'p', n: "Le long du mur D, de la gaine au mur des rangements. Caniveau d'évacuation au pied du muret. Membrane d'étanchéité sol et murs." },
-  partition: { t: 'Cloison de douche', d: '60 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 2,06 m, puis verre fixe cannelé sur les 42 derniers cm jusqu'au plafond, pour la lumière. Laisse 80 cm d'entrée et 59 cm de passage en diagonale jusqu'au banc." },
+  partition: { t: 'Cloison de douche', d: '70 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 2,06 m, puis verre fixe cannelé sur les 42 derniers cm jusqu'au plafond, pour la lumière. Laisse 70 cm d'entrée et 51 cm de passage en diagonale jusqu'au banc." },
   ledge: { t: 'Muret-tablette', d: '12 de profondeur · h. 130', s: 'p', n: 'Collé au mur D sur toute la longueur de la douche. Il cache les tuyaux, reçoit la robinetterie et sert de tablette.' },
   mixer: { t: 'Colonne thermostatique', d: 'mitigeur à 105 · douchette sur barre', s: 'p', n: "Mitigeur thermostatique (anti-brûlure) sur le muret, douchette à main sur barre pour se doucher assis et rincer la douche, douche de tête sur bras." },
   rain: { t: 'Douche de tête sur bras', d: 'bras sur la gaine · pomme Ø 25 à ≈ 2,08 m', s: 'p' },
-  bench: { t: 'Banc de douche', d: '60 × 40 · assise à 45', s: 'p', n: "Au fond, collé au mur des étagères sans vide. Un seul grand arrondi (quart de cercle de 40 cm) sur l'angle libre côté douche : 59 cm de passage en diagonale depuis le bout de la cloison. Au-dessus, 2,10 m sous rampant au minimum." },
+  bench: { t: 'Banc de douche', d: '50 × 40 · assise à 45', s: 'p', n: "Au fond, collé au mur des étagères sans vide. Un seul angle arrondi, l'angle libre côté douche : 51 cm de passage en diagonale depuis le bout de la cloison. Au-dessus, 2,10 m sous rampant au minimum." },
   sep: { t: 'Mur douche / rangements', d: '98 × 8 · jusqu’au rampant', s: 'p' },
   shelves: { t: 'Étagères ouvertes', d: '45 de profondeur · 70 de large', s: 'p', n: 'Pour les serviettes, ouvertes vers la pièce. Fond fermé ; en bas, deux bacs à roulettes de 90 cm exploitent toute la profondeur.' },
   vanity: { t: 'Meuble double vasque', d: '264 × 55 · plan à 76', s: 'p', n: "Meuble suspendu en chêne clair à tiroirs, plan en pierre claire, sur tout le mur B. Le plan est à 76 pour que le bord des vasques posées arrive à 90. Le plan libre côté porte sert pour le maquillage." },
@@ -635,13 +635,13 @@ boxFront.projTex = tiles2(98, H, 60, 120, [221, 210, 195], '#c9bca9');
 box(12, 98, 0, .6, 50, 190, 0xd6ccbe, { ...PJ, rough: .7, info: IP.shower });
 box(16, 22, .6, .9, 58, 146, 0xa88a5c, { ...PJ, metal: .6, rough: .3, info: IP.shower });
 box(0, 12, 0, 130, 50, 190, 0xd9cebf, { ...PJ, info: IP.ledge });
-box(90, 98, 0, 206, 50, 110, 0xe3dacd, { ...PJ, info: IP.partition });
+box(90, 98, 0, 206, 50, 120, 0xe3dacd, { ...PJ, info: IP.partition });
 {
   // Verre fixe cannelé au-dessus de la partie pleine
   const c = document.createElement('canvas'); c.width = 64; c.height = 8; const x = c.getContext('2d');
   x.fillStyle = '#dcebef'; x.fillRect(0, 0, 64, 8); x.fillStyle = '#b8d0d6'; for (let i = 0; i < 64; i += 8) x.fillRect(i, 0, 2, 8);
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9, 1); t.encoding = THREE.sRGBEncoding;
-  box(92.5, 95.5, 206, H, 50, 110, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .6, roughness: .15 }), info: IP.partition });
+  box(92.5, 95.5, 206, H, 50, 120, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .6, roughness: .15 }), info: IP.partition });
 }
 // Colonne thermostatique : barre mitigeur sur le muret, douchette sur barre au-dessus
 const laiton = { metal: .7, rough: .35 };
@@ -661,8 +661,8 @@ box(47, 51, 209, 212, 50, 92, 0xb8925a, { ...PJ, ...laiton, info: IP.rain });
 {
   const sh = new THREE.Shape();
   // Un seul angle arrondi : l'angle libre côté douche ; l'angle contre le mur des étagères reste droit (pas de vide)
-  // Grand arrondi sur toute la profondeur (r = 40) : le bout du banc est un quart de cercle qui finit contre le mur
-  sh.moveTo(12, -150); sh.lineTo(32, -150); sh.absarc(32, -190, 40, Math.PI / 2, 0, true); sh.lineTo(12, -190); sh.lineTo(12, -150);
+  // Banc de 50 : un seul angle arrondi (r = 25), l'angle libre côté douche ; angle droit contre le mur des étagères
+  sh.moveTo(12, -150); sh.lineTo(37, -150); sh.absarc(37, -175, 25, Math.PI / 2, 0, true); sh.lineTo(62, -190); sh.lineTo(12, -190); sh.lineTo(12, -150);
   const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 45, bevelEnabled: false, curveSegments: 20 }), new THREE.MeshStandardMaterial({ color: 0xd9cebf, roughness: .7 }));
   m.rotation.x = -Math.PI / 2; m.userData.info = IP.bench; proj.add(m); pickables.push(m);
 }
@@ -722,12 +722,12 @@ const winProj = buildWindow(wS2, WIN_BIG, IP.winP);
 // Cotes du projet
 dimLine([30, 1, 50], [30, 1, 190], 'douche 140', [1, 0, 0], projDims);
 dimLine([0, 1, 194], [90, 1, 194], '90', [0, 0, 1], projDims);
-dimLine([104, 1, 50], [104, 1, 110], 'cloison 60', [1, 0, 0], projDims);
-dimLine([104, 1, 110], [104, 1, 190], 'passage 80', [1, 0, 0], projDims);
+dimLine([104, 1, 50], [104, 1, 120], 'cloison 70', [1, 0, 0], projDims);
+dimLine([104, 1, 120], [104, 1, 190], 'passage 70', [1, 0, 0], projDims);
 dimLine([193, 1, 2], [193, 1, 266], 'meuble 264', [1, 0, 0], projDims);
 // Passage réel en diagonale : du bout de la cloison (côté douche) au point le plus proche de l'arrondi du banc
 {
-  const p0 = [90, 110], c = [32, 190], r = 40;
+  const p0 = [90, 120], c = [37, 175], r = 25;
   const dx = p0[0] - c[0], dz = p0[1] - c[1], d = Math.hypot(dx, dz);
   const q = [c[0] + r * dx / d, c[1] + r * dz / d];
   dimLine([p0[0], 47, p0[1]], [q[0], 47, q[1]], 'passage diagonal ' + Math.round(d - r), [0, 1, 0], projDims);
