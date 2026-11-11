@@ -86,7 +86,7 @@ dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-n
 .htag{font:500 11px var(--font-num);color:var(--est);background:var(--panel);border:1px dashed var(--est);padding:1px 5px;border-radius:4px;white-space:nowrap}
 .qtag{font:500 11px var(--font-ui);color:var(--water);background:var(--panel);border:1px solid var(--water);padding:2px 6px;border-radius:4px;max-width:150px;text-align:center}
 
-@media (max-width:760px){
+@media (max-width:900px){
   html,body{height:auto}
   body{overflow:auto}
   .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;height:auto}
@@ -163,8 +163,9 @@ dl.stats dd{margin:0;font-family:var(--font-num);text-align:right;font-variant-n
         <dt>Rampant</dt><dd>158 · 45°</dd>
         <dt>Gaine (coin A/D)</dt><dd>98 × 50</dd>
         <dt>Douche (projet)</dt><dd>140 × 90</dd>
-        <dt>Passage douche</dt><dd>80</dd>
-        <dt>Plan des vasques</dt><dd>h. 90</dd>
+        <dt>Passage douche</dt><dd>70</dd>
+        <dt>Bord des vasques</dt><dd>h. 90</dd>
+        <dt>Plan du meuble</dt><dd>h. 76</dd>
       </dl>
     </section>
 
@@ -367,7 +368,8 @@ const wC = surface([[0, 0], [L, 0], [L, KNEE], [0, KNEE]], null, (u, v) => [u, v
 // Rampant avec fenêtre de toit
 // Deux versions : ouverture actuelle (tunnel droit) et ouverture évasée du projet
 const WIN = { u0: 148, u1: 195, s0: 28, s1: 100 };
-const WIN_BIG = { u0: 120, u1: 222, s0: 8, s1: 124 };
+// Projet : ébrasement du bas vertical (descend jusqu'au pied du rampant), du haut horizontal, côtés évasés
+const WIN_BIG = { u0: 123, u1: 220, s0: 1, s1: 128 };
 const slopeTex = cladTexture(L, SLOPE_LEN, [{ to: 999, kind: 'crepi' }]);
 const slopeWith = h => surface([[0, 0], [L, 0], [L, SLOPE_LEN], [0, SLOPE_LEN]],
   [[[h.u0, h.s0], [h.u1, h.s0], [h.u1, h.s1], [h.u0, h.s1]]],
@@ -580,21 +582,20 @@ const proj = new THREE.Group(); scene.add(proj);
 const projDims = new THREE.Group(); scene.add(projDims);
 const PJ = { parent: proj };
 const IP = {
-  shower: { t: "Douche à l'italienne", d: '140 × 90 · de plain-pied', s: 'p', n: "Le long du mur D, de la gaine au mur des rangements. Caniveau d'évacuation au pied du muret." },
-  partition: { t: 'Cloison de douche', d: '60 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 1,65 m, puis carreaux de verre jusqu'au plafond pour la lumière. Laisse 80 cm de passage." },
-  ledge: { t: 'Muret-tablette', d: '9 de profondeur · h. 130', s: 'p', n: 'Collé au mur D sur toute la longueur de la douche. Il cache les tuyaux et sert de tablette. Le mitigeur est posé dessus.' },
-  mixer: { t: 'Mitigeur', d: 'h. 105', s: 'p', n: 'Sur le muret, côté gaine. Repère courant des fabricants : 100 à 110 cm du sol fini.' },
+  shower: { t: "Douche à l'italienne", d: '140 × 90 (78 utiles devant le muret)', s: 'p', n: "Le long du mur D, de la gaine au mur des rangements. Caniveau d'évacuation au pied du muret. Membrane d'étanchéité sol et murs." },
+  partition: { t: 'Cloison de douche', d: '70 de long · 8 d’épaisseur', s: 'p', n: "Alignée sur la gaine. Pleine jusqu'à 1,65 m, puis verre fixe cannelé jusqu'au plafond pour la lumière. Laisse 70 cm de passage." },
+  ledge: { t: 'Muret-tablette', d: '12 de profondeur · h. 130', s: 'p', n: 'Collé au mur D sur toute la longueur de la douche. Il cache les tuyaux, reçoit la robinetterie et sert de tablette.' },
+  mixer: { t: 'Colonne thermostatique', d: 'mitigeur à 105 · douchette sur barre', s: 'p', n: "Mitigeur thermostatique (anti-brûlure) sur le muret, douchette à main sur barre pour se doucher assis et rincer la douche, douche de tête sur bras." },
   rain: { t: 'Douche de tête sur bras', d: 'bras sur la gaine · pomme Ø 25 à ≈ 2,08 m', s: 'p' },
-  bench: { t: 'Banc de douche', d: '60 × 40 · assise à 45', s: 'p', n: "Au fond, contre le mur des rangements, bout arrondi côté passage. Au-dessus, 2,10 m sous rampant au minimum." },
+  bench: { t: 'Banc de douche', d: '60 × 40 · assise à 45', s: 'p', n: "Au fond, collé au mur des étagères sans vide. Un seul angle arrondi, l'angle libre côté douche, pour circuler sans se cogner. Au-dessus, 2,10 m sous rampant au minimum." },
   sep: { t: 'Mur douche / rangements', d: '98 × 8 · jusqu’au rampant', s: 'p' },
-  shelves: { t: 'Étagères ouvertes', d: '98 de profondeur · 70 de large', s: 'p', n: 'Pour les serviettes, ouvertes vers la pièce, sous le rampant.' },
-  vanity: { t: 'Meuble double vasque', d: '176 × 55 · plan à 90', s: 'p', n: "Les deux tiers du mur B, côté mur bas. Vasques à 1,30 m et 2,00 m de la porte : au-dessus de chacune, au moins 2 m sous le rampant." },
-  mirror: { t: 'Grand miroir éclairé', d: '115 × 70', s: 'p', n: 'Centré sur les vasques, bandeau LED en haut. Son bord droit reste sous la pente.' },
-  makeup: { t: 'Coiffeuse maquillage / bijoux', d: '76 × 45 · plan à 75', s: 'p', n: "Plus basse que les vasques pour s'asseoir, avec tiroir, miroir rond éclairé et armoire à bijoux murale." },
-  stool: { t: 'Tabouret', d: 'Ø 34 · h. 45', s: 'p' },
+  shelves: { t: 'Étagères ouvertes', d: '45 de profondeur · 70 de large', s: 'p', n: 'Pour les serviettes, ouvertes vers la pièce. Fond fermé ; en bas, deux bacs à roulettes de 90 cm exploitent toute la profondeur.' },
+  vanity: { t: 'Meuble double vasque', d: '264 × 55 · plan à 76', s: 'p', n: "Meuble suspendu en chêne clair à tiroirs, plan en pierre claire, sur tout le mur B. Le plan est à 76 pour que le bord des vasques posées arrive à 90. Le plan libre côté porte sert pour le maquillage." },
+  basin: { t: 'Vasques posées + robinets muraux', d: 'vasques ≈ 40 × 48 · bord à 90', s: 'p', n: "Vasques à 1,10 m et 2,00 m de la porte (90 cm d'écart) : au-dessus de chacune, au moins 2 m sous le rampant. Robinets laiton sortant du mur, au-dessus des vasques." },
+  mirror: { t: 'Grand miroir éclairé', d: '120 × 70', s: 'p', n: 'Centré sur les vasques, bandeau LED en haut (IRC ≥ 90, ≈ 4000 K). Son bord droit reste sous la pente.' },
   towel: { t: 'Sèche-serviettes', d: '50 × 110', s: 'p', n: "Au pied du mur bas, à l'emplacement du chauffage actuel. Modèle à choisir." },
   spots: { t: 'Spots encastrés', d: '3 au plafond', s: 'p' },
-  winP: { t: 'Fenêtre de toit (inchangée)', d: '47 × 72 · ouverture évasée ≈ 102 × 116', s: 'p', n: "Même fenêtre, mais l'ébrasement s'ouvre vers la pièce au lieu du tunnel actuel, pour faire entrer plus de lumière." },
+  winP: { t: 'Fenêtre de toit (inchangée)', d: '47 × 72 · ouverture ≈ 97 × 127', s: 'p', n: "Même fenêtre. Ébrasement du bas vertical, du haut horizontal, côtés évasés : la forme conseillée par les fabricants pour faire entrer le plus de lumière." },
 };
 const hAt = z => z <= FLAT ? H : H - (z - FLAT);   // hauteur sous plafond selon la position
 function prism(profile, x0, x1, color, info) {     // profil (z, y) extrudé de x0 à x1
@@ -612,78 +613,101 @@ function tileFloor(W, D, t, base, grout) {
   x.stroke();
   const tx = new THREE.CanvasTexture(c); tx.repeat.set(1 / W, 1 / D); tx.encoding = THREE.sRGBEncoding; return tx;
 }
-wF.projTex = tileFloor(L, P, 60, '#dedcd5', '#c9c7c0');
+function tiles2(W, Hh, tw, th, base, grout) {   // grands carreaux tw × th (cm), légère variation de teinte
+  const c = document.createElement('canvas'); c.width = Math.ceil(W * S); c.height = Math.ceil(Hh * S);
+  const x = c.getContext('2d');
+  for (let v = 0; v < Hh; v += th) for (let u = 0; u < W; u += tw) {
+    x.fillStyle = rgb(base, (R() - .5) * 5); x.fillRect(u * S, (Hh - v - th) * S, tw * S, th * S);
+  }
+  x.strokeStyle = grout; x.lineWidth = 1; x.beginPath();
+  for (let u = 0; u <= W; u += tw) { x.moveTo(u * S, 0); x.lineTo(u * S, c.height); }
+  for (let v = 0; v <= Hh; v += th) { x.moveTo(0, (Hh - v) * S); x.lineTo(c.width, (Hh - v) * S); }
+  x.stroke();
+  const tx = new THREE.CanvasTexture(c); tx.repeat.set(1 / W, 1 / Hh); tx.encoding = THREE.sRGBEncoding; return tx;
+}
+// Ambiance d'après les inspirations : grands carreaux beige clair au sol, carreaux beige dans la douche
+wF.projTex = tiles2(L, P, 60, 120, [226, 219, 207], '#cfc6b8');
+wD.projTex = tiles2(P, H, 60, 120, [221, 210, 195], '#c9bca9');
+boxFront.projTex = tiles2(98, H, 60, 120, [221, 210, 195], '#c9bca9');
 
 // Douche
-box(9, 98, 0, .6, 50, 190, 0xcfcdc6, { ...PJ, rough: .7, info: IP.shower });
-box(13, 19, .6, .9, 58, 146, 0x7d8584, { ...PJ, metal: .6, rough: .3, info: IP.shower });
-box(0, 9, 0, 130, 50, 190, 0xe3e1da, { ...PJ, info: IP.ledge });
-box(90, 98, 0, 165, 50, 110, 0xf1f0eb, { ...PJ, info: IP.partition });
+box(12, 98, 0, .6, 50, 190, 0xd6ccbe, { ...PJ, rough: .7, info: IP.shower });
+box(16, 22, .6, .9, 58, 146, 0xa88a5c, { ...PJ, metal: .6, rough: .3, info: IP.shower });
+box(0, 12, 0, 130, 50, 190, 0xd9cebf, { ...PJ, info: IP.ledge });
+box(90, 98, 0, 165, 50, 120, 0xe3dacd, { ...PJ, info: IP.partition });
 {
-  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
-  x.fillStyle = '#a9c2c9'; x.fillRect(0, 0, 64, 64); x.fillStyle = '#e4f0f3'; x.fillRect(4, 4, 56, 56);
-  x.fillStyle = '#d3e5ea'; x.fillRect(12, 12, 40, 40);
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 4); t.encoding = THREE.sRGBEncoding;
-  box(90, 98, 165, H, 50, 110, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .8, roughness: .2 }), info: IP.partition });
+  // Verre fixe cannelé au-dessus de la partie pleine
+  const c = document.createElement('canvas'); c.width = 64; c.height = 8; const x = c.getContext('2d');
+  x.fillStyle = '#dcebef'; x.fillRect(0, 0, 64, 8); x.fillStyle = '#b8d0d6'; for (let i = 0; i < 64; i += 8) x.fillRect(i, 0, 2, 8);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9, 1); t.encoding = THREE.sRGBEncoding;
+  box(92.5, 95.5, 165, H, 50, 120, 0, { ...PJ, mat: new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: .6, roughness: .15 }), info: IP.partition });
 }
-box(9, 13, 98, 112, 68, 82, 0xc4cacb, { ...PJ, ...chrome, info: IP.mixer });
-box(13, 19, 104, 107, 73, 77, 0xc4cacb, { ...PJ, ...chrome, info: IP.mixer });
-box(47, 51, 209, 212, 50, 92, 0xc4cacb, { ...PJ, ...chrome, info: IP.rain });
+// Colonne thermostatique : barre mitigeur sur le muret, douchette sur barre au-dessus
+const laiton = { metal: .7, rough: .35 };
+box(12, 16, 101, 108, 60, 92, 0xb8925a, { ...PJ, ...laiton, info: IP.mixer });
+for (const z of [61, 91]) {
+  const k = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 5, 20), new THREE.MeshStandardMaterial({ color: 0xb8925a, metalness: .7, roughness: .35 }));
+  k.rotation.z = Math.PI / 2; k.position.set(17, 104.5, z); k.userData.info = IP.mixer; proj.add(k); pickables.push(k);
+}
+box(1, 3.5, 140, 205, 74, 77, 0xb8925a, { ...PJ, ...laiton, info: IP.mixer });
+box(3.5, 9, 176, 196, 73, 78, 0xb8925a, { ...PJ, ...laiton, info: IP.mixer });
+box(47, 51, 209, 212, 50, 92, 0xb8925a, { ...PJ, ...laiton, info: IP.rain });
 {
-  const head = new THREE.Mesh(new THREE.CylinderGeometry(12.5, 12.5, 1.5, 32), new THREE.MeshStandardMaterial({ color: 0xc4cacb, metalness: .8, roughness: .25 }));
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(12.5, 12.5, 1.5, 32), new THREE.MeshStandardMaterial({ color: 0xb8925a, metalness: .7, roughness: .35 }));
   head.position.set(49, 207.5, 95); head.userData.info = IP.rain; proj.add(head); pickables.push(head);
 }
 // Banc 60 × 40, bout arrondi côté passage (forme dessinée en x / -z puis extrudée vers le haut)
 {
   const sh = new THREE.Shape();
-  sh.moveTo(9, -150); sh.lineTo(49, -150); sh.absarc(49, -170, 20, Math.PI / 2, -Math.PI / 2, true); sh.lineTo(9, -190); sh.lineTo(9, -150);
-  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 45, bevelEnabled: false, curveSegments: 20 }), new THREE.MeshStandardMaterial({ color: 0xe3e1da, roughness: .7 }));
+  // Un seul angle arrondi : l'angle libre côté douche ; l'angle contre le mur des étagères reste droit (pas de vide)
+  sh.moveTo(12, -150); sh.lineTo(47, -150); sh.absarc(47, -175, 25, Math.PI / 2, 0, true); sh.lineTo(72, -190); sh.lineTo(12, -190); sh.lineTo(12, -150);
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 45, bevelEnabled: false, curveSegments: 20 }), new THREE.MeshStandardMaterial({ color: 0xd9cebf, roughness: .7 }));
   m.rotation.x = -Math.PI / 2; m.userData.info = IP.bench; proj.add(m); pickables.push(m);
 }
 // Mur entre douche et rangements, jusqu'au rampant
-prism([[190, 0], [198, 0], [198, hAt(198)], [190, hAt(190)]], 0, 98, 0xf1f0eb, IP.sep);
-// Étagères ouvertes (serviettes)
-for (const y of [0, 34, 68, 102, 136, 168]) {
+prism([[190, 0], [198, 0], [198, hAt(198)], [190, hAt(190)]], 0, 98, 0xe3dacd, IP.sep);
+// Étagères de 45 cm côté pièce, fond fermé, bacs à roulettes en bas sur toute la profondeur
+for (const y of [32, 66, 100, 134, 166]) {
   const z1 = Math.min(266, P - Math.max(0, y + 3 - KNEE) - 1);
-  box(1, 97, y + .5, y + 3, 199, z1, 0xd2b48c, { ...PJ, info: IP.shelves });
+  box(52, 97, y + .5, y + 3, 199, z1, 0xc8a073, { ...PJ, rough: .7, info: IP.shelves });
+}
+prism([[198, 32], [266, 32], [266, hAt(266)], [198, hAt(198)]], 50, 52, 0xe9e2d7, IP.shelves);
+for (const [z0, z1] of [[201, 231], [234, 264]]) {
+  box(5, 96, 3, 30, z0, z1, 0xb89b74, { ...PJ, rough: 1, info: IP.shelves });
+  box(95.6, 96.4, 12, 18, (z0 + z1) / 2 - 6, (z0 + z1) / 2 + 6, 0x6f7a77, { ...PJ, info: IP.shelves });
 }
 // Meuble double vasque (2/3 du mur B, côté mur bas)
-box(199, 254, 15, 86, 90, 266, 0xf3f2ec, { ...PJ, info: IP.vanity });
-for (const z of [148, 208]) box(198.4, 199, 18, 84, z - .4, z + .4, 0xcfcdc6, { ...PJ, info: IP.vanity });
-box(198.4, 199, 50, 50.8, 92, 264, 0xcfcdc6, { ...PJ, info: IP.vanity });
-box(197, 254, 86, 90, 88, P, 0xe7e4dc, { ...PJ, rough: .45, info: IP.vanity });
-for (const z of [130, 200]) {
-  const sh = new THREE.Shape(); sh.absellipse(0, 0, 17, 22, 0, Math.PI * 2, false, 0);
-  const b = new THREE.Mesh(new THREE.ShapeGeometry(sh, 32), new THREE.MeshStandardMaterial({ color: 0xd3d9d8, roughness: .3 }));
-  b.rotation.x = -Math.PI / 2; b.position.set(224, 90.15, z); b.userData.info = IP.vanity; proj.add(b); pickables.push(b);
-  box(247, 251, 90, 110, z - 2, z + 2, 0xc4cacb, { ...PJ, ...chrome, info: IP.vanity });
-  box(236, 251, 106, 109, z - 1.5, z + 1.5, 0xc4cacb, { ...PJ, ...chrome, info: IP.vanity });
+// Meuble suspendu en chêne clair, plan en pierre claire à 76, vasques posées (bord à 90), robinets muraux laiton
+const OAK = 0xc8a073, BRASS = 0xb8925a, brass = { metal: .7, rough: .35 };
+box(199, 254, 25, 72, 2, 266, OAK, { ...PJ, rough: .7, info: IP.vanity });
+for (const z of [68, 134, 200]) box(198.4, 199, 26, 71, z - .3, z + .3, 0x9c7a55, { ...PJ, info: IP.vanity });
+box(198.4, 199, 48.3, 48.9, 4, 264, 0x9c7a55, { ...PJ, info: IP.vanity });
+box(197, 254, 72, 76, 0, P, 0xe6dfd3, { ...PJ, rough: .5, info: IP.vanity });
+for (const z of [110, 200]) {
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(20, 13, 14, 48), new THREE.MeshStandardMaterial({ color: 0xf6f5f1, roughness: .3 }));
+  bowl.scale.z = 1.2; bowl.position.set(226, 83, z); bowl.userData.info = IP.basin; proj.add(bowl); pickables.push(bowl);
+  const inner = new THREE.Mesh(new THREE.CircleGeometry(18, 40), new THREE.MeshStandardMaterial({ color: 0xdcdedb, roughness: .3 }));
+  inner.scale.set(1, 1.2, 1); inner.rotation.x = -Math.PI / 2; inner.position.set(226, 90.05, z); inner.userData.info = IP.basin; proj.add(inner); pickables.push(inner);
+  box(234, 254, 101, 104, z - 1.5, z + 1.5, BRASS, { ...PJ, ...brass, info: IP.basin });
+  box(251, 254, 110, 116, z - 3, z + 3, BRASS, { ...PJ, ...brass, info: IP.basin });
+}
+// Plante et tapis, pour l'ambiance
+{
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(7, 6, 16, 24), new THREE.MeshStandardMaterial({ color: 0xf1ede6, roughness: .8 }));
+  pot.position.set(232, 84, 36); proj.add(pot);
+  const leaves = new THREE.Mesh(new THREE.IcosahedronGeometry(16, 1), new THREE.MeshStandardMaterial({ color: 0x6f8f5e, roughness: .9, flatShading: true }));
+  leaves.position.set(232, 104, 36); leaves.scale.set(.9, 1.2, .9); proj.add(leaves);
+  box(140, 195, 0, .8, 110, 200, 0xd9cfbf, { ...PJ, rough: 1 });
 }
 {
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(115, 70), new THREE.MeshStandardMaterial({ color: 0xc6d3d6, metalness: .35, roughness: .12 }));
-  m.rotation.y = -Math.PI / 2; m.position.set(253.4, 147, 162.5); m.userData.info = IP.mirror; proj.add(m); pickables.push(m);
-  box(250, 254, 183, 185, 105, 215, 0xfff4dc, { ...PJ, mat: new THREE.MeshStandardMaterial({ color: 0xfff4dc, emissive: 0xffe2a8, emissiveIntensity: .9 }), info: IP.mirror });
-}
-// Coiffeuse maquillage / bijoux (coin A/B)
-const oak = 0xd5bd99;
-box(209, 254, 72, 76, 4, 80, oak, { ...PJ, info: IP.makeup });
-box(213, 254, 63, 72, 8, 76, 0xf3f2ec, { ...PJ, info: IP.makeup });
-box(211, 215, 0, 72, 5, 9, oak, { ...PJ, info: IP.makeup });
-box(211, 215, 0, 72, 75, 79, oak, { ...PJ, info: IP.makeup });
-box(240, 254, 150, 215, 8, 76, 0xf3f2ec, { ...PJ, info: IP.makeup });
-box(238.6, 240, 180, 186, 40, 44, 0xc4cacb, { ...PJ, ...chrome, info: IP.makeup });
-{
-  const mm = new THREE.Mesh(new THREE.CircleGeometry(24, 40), new THREE.MeshStandardMaterial({ color: 0xc6d3d6, metalness: .35, roughness: .12 }));
-  mm.rotation.y = -Math.PI / 2; mm.position.set(253.3, 112, 42); mm.userData.info = IP.makeup; proj.add(mm); pickables.push(mm);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(24, 1.3, 10, 48), new THREE.MeshStandardMaterial({ color: 0xfff4dc, emissive: 0xffe2a8, emissiveIntensity: .9 }));
-  ring.rotation.y = Math.PI / 2; ring.position.set(252.8, 112, 42); ring.userData.info = IP.makeup; proj.add(ring); pickables.push(ring);
-  const st = new THREE.Mesh(new THREE.CylinderGeometry(17, 17, 45, 32), new THREE.MeshStandardMaterial({ color: oak, roughness: .7 }));
-  st.position.set(196, 22.5, 42); st.userData.info = IP.stool; proj.add(st); pickables.push(st);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(120, 70), new THREE.MeshStandardMaterial({ color: 0xc6d3d6, metalness: .35, roughness: .12 }));
+  m.rotation.y = -Math.PI / 2; m.position.set(253.4, 147, 155); m.userData.info = IP.mirror; proj.add(m); pickables.push(m);
+  box(250, 254, 183, 185, 96, 214, 0xfff4dc, { ...PJ, mat: new THREE.MeshStandardMaterial({ color: 0xfff4dc, emissive: 0xffe2a8, emissiveIntensity: .9 }), info: IP.mirror });
 }
 // Sèche-serviettes au pied du mur bas
-box(115, 118, 12, 122, 261, 265, 0xeeeeea, { ...PJ, info: IP.towel });
-box(162, 165, 12, 122, 261, 265, 0xeeeeea, { ...PJ, info: IP.towel });
-for (let y = 18; y <= 118; y += 10) box(115, 165, y, y + 2, 261.5, 264.5, 0xeeeeea, { ...PJ, info: IP.towel });
+box(115, 118, 12, 122, 261, 265, 0xb8925a, { ...PJ, metal: .7, rough: .35, info: IP.towel });
+box(162, 165, 12, 122, 261, 265, 0xb8925a, { ...PJ, metal: .7, rough: .35, info: IP.towel });
+for (let y = 18; y <= 118; y += 10) box(115, 165, y, y + 2, 261.5, 264.5, 0xb8925a, { ...PJ, metal: .7, rough: .35, info: IP.towel });
 // Spots
 {
   const spotM = new THREE.MeshStandardMaterial({ color: 0xfff6e0, emissive: 0xffe7b8, emissiveIntensity: .9 });
@@ -696,10 +720,9 @@ const winProj = buildWindow(wS2, WIN_BIG, IP.winP);
 // Cotes du projet
 dimLine([30, 1, 50], [30, 1, 190], 'douche 140', [1, 0, 0], projDims);
 dimLine([0, 1, 194], [90, 1, 194], '90', [0, 0, 1], projDims);
-dimLine([104, 1, 50], [104, 1, 110], 'cloison 60', [1, 0, 0], projDims);
-dimLine([104, 1, 110], [104, 1, 190], 'passage 80', [1, 0, 0], projDims);
-dimLine([193, 1, 90], [193, 1, 266], 'meuble 176', [1, 0, 0], projDims);
-dimLine([205, 1, 4], [205, 1, 80], 'coiffeuse 76', [1, 0, 0], projDims);
+dimLine([104, 1, 50], [104, 1, 120], 'cloison 70', [1, 0, 0], projDims);
+dimLine([104, 1, 120], [104, 1, 190], 'passage 70', [1, 0, 0], projDims);
+dimLine([193, 1, 2], [193, 1, 266], 'meuble 264', [1, 0, 0], projDims);
 
 /* ---------- Lettres des murs ---------- */
 wA.tag = label('A', 'wtag', [176, 232, 1], scene);
@@ -755,7 +778,7 @@ function applyMode() {
   $('t-clad').disabled = P; $('l-clad').classList.toggle('off', P);
   walls.forEach(w => {
     let map = null, col = w.plain;
-    if (P) { map = w.projTex || null; col = map ? '#ffffff' : '#e4e2dc'; }
+    if (P) { map = w.projTex || null; col = map ? '#ffffff' : '#ece6dd'; }
     else if (cladOn) { map = w.tex; col = '#ffffff'; }
     w.mat.map = map; w.mat.color.set(col); w.mat.needsUpdate = true;
   });
@@ -812,7 +835,11 @@ renderer.domElement.addEventListener('pointerup', e => {
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false); labelR.setSize(w, h);
-  camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
+  camera.aspect = w / Math.max(h, 1);
+  // Écran étroit (téléphone en portrait) : on élargit le champ pour garder toute la largeur des murs
+  const BASE = 58 * Math.PI / 180, ref = 1.3;
+  camera.fov = camera.aspect >= ref ? 58 : Math.min(85, 2 * Math.atan(Math.tan(BASE / 2) * ref / camera.aspect) * 180 / Math.PI);
+  camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage); resize();
 go('persp', true);
